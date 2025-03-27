@@ -49,3 +49,13 @@ def login(username, password):
     else:
         print('Invalid username or password.')
         return None
+
+
+def get_user_role(username):
+    """Retrieve the role of a user."""
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT role FROM users WHERE username = ?', (username,))
+    result = cursor.fetchone()
+    conn.close()
+    return result[0] if result else None

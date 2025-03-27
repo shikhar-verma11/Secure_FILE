@@ -99,3 +99,33 @@ if __name__ == "__main__":
             list_users()
         elif choice == '4':
             break
+
+import pyotp
+
+def register(username, password, role='user'):
+    """Register a user and generate a unique 2FA secret key."""
+    conn = sqlite3.connect('secure_file_manager.db')
+    cursor = conn.cursor()
+
+    secret = pyotp.random_base32()  # Generate unique 2FA key
+    try:
+        cursor.execute(
+            'INSERT INTO users (username, password_hash, role, totp_secret) VALUES (?, ?, ?, ?)',
+            (username, hash_password(password), role, secret)
+        )
+        conn.commit()
+        print(f'✅ User "{username}" registered successfully!')
+
+        # Generate QR Code for 2FA setup
+        totp = pyotp.TOTP(secret)
+        uri = totp.provisioning_uri(username, issuer_name="SecureFileManager")
+
+        print("\n📲 Scan this QR code in Google Authenticator or Authy:\n")
+        import qrcode
+        qr = qrcode.make(uri)
+        qr.show()
+
+    except sqlite3.IntegrityError:
+        print(f'❌ Username "{username}" already exists.')
+    finally:
+        conn.close()

@@ -22,3 +22,18 @@ def load_key():
         raise FileNotFoundError("❌ Encryption key not found. Run generate_key() first.")
     with open(KEY_FILE, "rb") as f:
         return f.read()
+def encrypt_file(file_path):
+    """Encrypt a file using AES encryption."""
+    key = load_key()
+    cipher = AES.new(key, AES.MODE_EAX)
+
+    with open(file_path, "rb") as f:
+        plaintext = f.read()
+
+    ciphertext, tag = cipher.encrypt_and_digest(plaintext)
+
+    with open(file_path + ".enc", "wb") as f:
+        f.write(cipher.nonce + tag + ciphertext)
+
+    os.remove(file_path)  # Remove the original file
+    print(f"🔒 File '{file_path}' encrypted successfully.")

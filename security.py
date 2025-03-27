@@ -60,3 +60,14 @@ def ensure_enc_extension(file_name):
     if not file_name.endswith(".enc"):
         file_name += ".enc"
     return file_name
+import os
+
+def encrypt_and_store(username, file_name):
+    """Encrypt a file and store it securely."""
+    folder_path = os.path.join("secure_files", username)
+    file_path = os.path.join(folder_path, file_name)
+
+    if os.path.exists(file_path):
+        encrypt_file(file_path)
+    else:
+        print(f"❌ Error: '{file_name}' not found for user '{username}'.")

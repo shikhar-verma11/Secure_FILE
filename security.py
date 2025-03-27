@@ -55,3 +55,8 @@ def decrypt_file(file_path):
 
     os.remove(file_path)  # Remove the encrypted file
     print(f"🔓 File '{original_path}' decrypted successfully.")
+def ensure_enc_extension(file_name):
+    """Ensure the file has the .enc extension."""
+    if not file_name.endswith(".enc"):
+        file_name += ".enc"
+    return file_name

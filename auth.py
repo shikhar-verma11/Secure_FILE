@@ -59,3 +59,16 @@ def get_user_role(username):
     result = cursor.fetchone()
     conn.close()
     return result[0] if result else None
+
+
+def list_users():
+    """List all registered users (Admin only)."""
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT username, role FROM users')
+    users = cursor.fetchall()
+    conn.close()
+
+    print("\nRegistered Users:")
+    for user, role in users:
+        print(f"- {user} ({role})")

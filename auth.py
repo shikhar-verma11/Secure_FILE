@@ -136,3 +136,23 @@ def register(username, password, role='user'):
         print(f'❌ Username "{username}" already exists.')
     finally:
         conn.close()
+
+def reset_2fa(username):
+    """Reset 2FA secret for a user."""
+    conn = sqlite3.connect('secure_file_manager.db')
+    cursor = conn.cursor()
+
+    new_secret = pyotp.random_base32()
+    cursor.execute('UPDATE users SET totp_secret = ? WHERE username = ?', (new_secret, username))
+    conn.commit()
+    conn.close()
+
+    print(f'🔄 2FA reset for "{username}". Scan the new QR code in your Authenticator app.')
+
+    # Generate new QR Code
+    totp = pyotp.TOTP(new_secret)
+    uri = totp.provisioning_uri(username, issuer_name="SecureFileManager")
+
+    import qrcode
+    qr = qrcode.make(uri)
+    qr.show()

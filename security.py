@@ -37,3 +37,21 @@ def encrypt_file(file_path):
 
     os.remove(file_path)  # Remove the original file
     print(f"🔒 File '{file_path}' encrypted successfully.")
+def decrypt_file(file_path):
+    """Decrypt a file encrypted with AES."""
+    key = load_key()
+
+    with open(file_path, "rb") as f:
+        nonce = f.read(16)
+        tag = f.read(16)
+        ciphertext = f.read()
+
+    cipher = AES.new(key, AES.MODE_EAX, nonce=nonce)
+    plaintext = cipher.decrypt_and_verify(ciphertext, tag)
+
+    original_path = file_path.replace(".enc", "")
+    with open(original_path, "wb") as f:
+        f.write(plaintext)
+
+    os.remove(file_path)  # Remove the encrypted file
+    print(f"🔓 File '{original_path}' decrypted successfully.")

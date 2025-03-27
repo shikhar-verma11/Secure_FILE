@@ -36,20 +36,27 @@ def register(username, password, role='user'):
     conn.close()
 
 def login(username, password):
-    """Authenticate user by verifying hashed password."""
-    conn = sqlite3.connect('users.db')
+    """Authenticate user with password and 2FA."""
+    conn = sqlite3.connect('secure_file_manager.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT password_hash, role FROM users WHERE username = ?', (username,))
+    cursor.execute('SELECT password_hash, role, totp_secret FROM users WHERE username = ?', (username,))
     result = cursor.fetchone()
     conn.close()
 
     if result and result[0] == hash_password(password):
-        print(f'Login successful! Role: {result[1]}')
-        return result[1]
-    else:
-        print('Invalid username or password.')
-        return None
+        totp_secret = result[2]
+        totp = pyotp.TOTP(totp_secret)
+        otp = input("Enter 2FA Code from Authenticator App: ").strip()
 
+        if totp.verify(otp):
+            print(f'✅ Login successful! Role: {result[1]}')
+            return result[1]  # Return user role ('admin' or 'user')
+        else:
+            print('❌ Invalid 2FA code.')
+            return None
+    else:
+        print('❌ Invalid username or password.')
+        return None
 
 def get_user_role(username):
     """Retrieve the role of a user."""
@@ -80,3 +87,72 @@ def validate_username(username):
 def validate_password(password):
     """Ensure password meets security standards."""
     return len(password) >= 6
+
+
+if __name__ == "__main__":
+    initialize_db()
+    while True:
+        print("\n1. Register\n2. Login\n3. List Users (Admin Only)\n4. Exit")
+        choice = input("Enter choice: ").strip()
+        if choice == '1':
+            username = input("Enter username: ")
+            password = input("Enter password: ")
+            register(username, password)
+        elif choice == '2':
+            username = input("Enter username: ")
+            password = input("Enter password: ")
+            login(username, password)
+        elif choice == '3':
+            list_users()
+        elif choice == '4':
+            break
+
+import pyotp
+
+def register(username, password, role='user'):
+    """Register a user and generate a unique 2FA secret key."""
+    conn = sqlite3.connect('secure_file_manager.db')
+    cursor = conn.cursor()
+
+    secret = pyotp.random_base32()  # Generate unique 2FA key
+    try:
+        cursor.execute(
+            'INSERT INTO users (username, password_hash, role, totp_secret) VALUES (?, ?, ?, ?)',
+            (username, hash_password(password), role, secret)
+        )
+        conn.commit()
+        print(f'✅ User "{username}" registered successfully!')
+
+        # Generate QR Code for 2FA setup
+        totp = pyotp.TOTP(secret)
+        uri = totp.provisioning_uri(username, issuer_name="SecureFileManager")
+
+        print("\n📲 Scan this QR code in Google Authenticator or Authy:\n")
+        import qrcode
+        qr = qrcode.make(uri)
+        qr.show()
+
+    except sqlite3.IntegrityError:
+        print(f'❌ Username "{username}" already exists.')
+    finally:
+        conn.close()
+
+def reset_2fa(username):
+    """Reset 2FA secret for a user."""
+    conn = sqlite3.connect('secure_file_manager.db')
+    cursor = conn.cursor()
+
+    new_secret = pyotp.random_base32()
+    cursor.execute('UPDATE users SET totp_secret = ? WHERE username = ?', (new_secret, username))
+    conn.commit()
+    conn.close()
+
+    print(f'🔄 2FA reset for "{username}". Scan the new QR code in your Authenticator app.')
+
+    # Generate new QR Code
+    totp = pyotp.TOTP(new_secret)
+    uri = totp.provisioning_uri(username, issuer_name="SecureFileManager")
+
+    import qrcode
+    qr = qrcode.make(uri)
+    qr.show()

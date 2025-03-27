@@ -36,20 +36,27 @@ def register(username, password, role='user'):
     conn.close()
 
 def login(username, password):
-    """Authenticate user by verifying hashed password."""
-    conn = sqlite3.connect('users.db')
+    """Authenticate user with password and 2FA."""
+    conn = sqlite3.connect('secure_file_manager.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT password_hash, role FROM users WHERE username = ?', (username,))
+    cursor.execute('SELECT password_hash, role, totp_secret FROM users WHERE username = ?', (username,))
     result = cursor.fetchone()
     conn.close()
 
     if result and result[0] == hash_password(password):
-        print(f'Login successful! Role: {result[1]}')
-        return result[1]
-    else:
-        print('Invalid username or password.')
-        return None
+        totp_secret = result[2]
+        totp = pyotp.TOTP(totp_secret)
+        otp = input("Enter 2FA Code from Authenticator App: ").strip()
 
+        if totp.verify(otp):
+            print(f'✅ Login successful! Role: {result[1]}')
+            return result[1]  # Return user role ('admin' or 'user')
+        else:
+            print('❌ Invalid 2FA code.')
+            return None
+    else:
+        print('❌ Invalid username or password.')
+        return None
 
 def get_user_role(username):
     """Retrieve the role of a user."""

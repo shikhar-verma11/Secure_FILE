@@ -80,3 +80,22 @@ def validate_username(username):
 def validate_password(password):
     """Ensure password meets security standards."""
     return len(password) >= 6
+
+
+if __name__ == "__main__":
+    initialize_db()
+    while True:
+        print("\n1. Register\n2. Login\n3. List Users (Admin Only)\n4. Exit")
+        choice = input("Enter choice: ").strip()
+        if choice == '1':
+            username = input("Enter username: ")
+            password = input("Enter password: ")
+            register(username, password)
+        elif choice == '2':
+            username = input("Enter username: ")
+            password = input("Enter password: ")
+            login(username, password)
+        elif choice == '3':
+            list_users()
+        elif choice == '4':
+            break

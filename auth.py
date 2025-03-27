@@ -15,3 +15,9 @@ def initialize_db():
 
 if __name__ == "__main__":
     initialize_db()
+
+import hashlib
+
+def hash_password(password):
+    """Generate SHA256 hash for the password."""
+    return hashlib.sha256(password.encode()).hexdigest()

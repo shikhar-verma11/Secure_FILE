@@ -71,3 +71,19 @@ def encrypt_and_store(username, file_name):
         encrypt_file(file_path)
     else:
         print(f"❌ Error: '{file_name}' not found for user '{username}'.")
+def decrypt_and_read(username, file_name):
+    """Decrypt a file and read its content."""
+    folder_path = os.path.join("secure_files", username)
+    enc_file_path = os.path.join(folder_path, ensure_enc_extension(file_name))
+
+    if os.path.exists(enc_file_path):
+        decrypt_file(enc_file_path)
+        decrypted_path = enc_file_path.replace(".enc", "")
+
+        with open(decrypted_path, "r") as f:
+            content = f.read()
+            print(f"\n📖 Content of '{file_name}':\n{content}\n")
+
+        encrypt_file(decrypted_path)  # Re-encrypt after reading
+    else:
+        print(f"❌ Error: '{file_name}' not found.")

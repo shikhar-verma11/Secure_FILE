@@ -87,3 +87,5 @@ def decrypt_and_read(username, file_name):
         encrypt_file(decrypted_path)  # Re-encrypt after reading
     else:
         print(f"❌ Error: '{file_name}' not found.")
+if _name_ == "_main_":
+    print("🔐 Secure Encryption Module Loaded.")

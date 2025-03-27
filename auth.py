@@ -72,3 +72,11 @@ def list_users():
     print("\nRegistered Users:")
     for user, role in users:
         print(f"- {user} ({role})")
+
+def validate_username(username):
+    """Check if the username meets requirements."""
+    return len(username) >= 3
+
+def validate_password(password):
+    """Ensure password meets security standards."""
+    return len(password) >= 6

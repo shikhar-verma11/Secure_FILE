@@ -16,3 +16,9 @@ def generate_key():
 
 if _name_ == "_main_":
     generate_key()
+def load_key():
+    """Load the encryption key from file."""
+    if not os.path.exists(KEY_FILE):
+        raise FileNotFoundError("❌ Encryption key not found. Run generate_key() first.")
+    with open(KEY_FILE, "rb") as f:
+        return f.read()

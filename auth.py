@@ -34,3 +34,18 @@ def register(username, password, role='user'):
     except sqlite3.IntegrityError:
         print(f'Username "{username}" already exists.')
     conn.close()
+
+def login(username, password):
+    """Authenticate user by verifying hashed password."""
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT password_hash, role FROM users WHERE username = ?', (username,))
+    result = cursor.fetchone()
+    conn.close()
+
+    if result and result[0] == hash_password(password):
+        print(f'Login successful! Role: {result[1]}')
+        return result[1]
+    else:
+        print('Invalid username or password.')
+        return None

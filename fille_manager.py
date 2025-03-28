@@ -106,3 +106,4 @@ if _name_ == "_main_":
 
 
 print("\nSecure File Management System Initialized.")
+"""THE USER CAN USE THE GIVEN functions according to the options it gets choosen by"""

@@ -55,4 +55,22 @@ def delete_file(username, file_name):
         print(f"🗑 File '{file_name}' deleted.")
     else:
         print(f"❌ Error: File '{file_name}' not found.")
+def list_user_files(username):
+    """List all files of a user."""
+    folder_path = get_user_folder(username)
+
+    if not os.path.exists(folder_path):
+        print(f"❌ User '{username}' has no files.")
+        return []
+
+    files = os.listdir(folder_path)
+
+    if not files:
+        print(f"📂 No files found for user '{username}'.")
+    else:
+        print(f"📂 Files for user '{username}':")
+        for file in files:
+            print(f"- {file}")
+
+    return files
 

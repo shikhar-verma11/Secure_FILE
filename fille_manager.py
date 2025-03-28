@@ -31,4 +31,17 @@ def read_file(username, file_name):
         content = f.read()
 
     print(f"\n📖 Content of '{file_name}':\n{content}\n")
+def update_file(username, file_name, new_content):
+    """Update the content of an existing file."""
+    folder_path = get_user_folder(username)
+    file_path = os.path.join(folder_path, file_name)
+
+    if not os.path.exists(file_path):
+        print(f"❌ Error: File '{file_name}' not found.")
+        return
+
+    with open(file_path, "w") as f:
+        f.write(new_content)
+
+    print(f"✅ File '{file_name}' updated successfully.")
 

@@ -1,25 +1,26 @@
+import os
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
-import os
 
 KEY_FILE = "encryption_key.key"
 
 def generate_key():
-    """Generate and save a new encryption key."""
     if not os.path.exists(KEY_FILE):
-        key = get_random_bytes(32)  # 256-bit key
+        key = get_random_bytes(32)  # 256-bit AES key
         with open(KEY_FILE, "wb") as f:
             f.write(key)
         print("🔑 Encryption key generated.")
     else:
-        print("🔑 Key already exists.")
+        print("🔑 Encryption key already exists.")
 
 def load_key():
-    """Load the encryption key from file."""
-    if not os.path.exists(KEY_FILE):
-        raise FileNotFoundError("❌ Encryption key not found. Run generate_key() first.")
+    generate_key()  # Ensure key exists before loading
     with open(KEY_FILE, "rb") as f:
         return f.read()
+
+
+generate_key()
+
 
 def encrypt_file(file_path):
     """Encrypt a file using AES encryption."""
@@ -89,5 +90,5 @@ def decrypt_and_read(username, file_name):
     else:
         print(f"❌ Error: '{file_name}' not found.")
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     print("🔐 Secure Encryption Module Loaded.")

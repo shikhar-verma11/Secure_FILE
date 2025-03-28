@@ -45,3 +45,14 @@ def update_file(username, file_name, new_content):
 
     print(f"✅ File '{file_name}' updated successfully.")
 
+def delete_file(username, file_name):
+    """Delete a file."""
+    folder_path = get_user_folder(username)
+    file_path = os.path.join(folder_path, file_name)
+
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        print(f"🗑 File '{file_name}' deleted.")
+    else:
+        print(f"❌ Error: File '{file_name}' not found.")
+

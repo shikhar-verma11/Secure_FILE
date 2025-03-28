@@ -14,14 +14,13 @@ def generate_key():
     else:
         print("🔑 Key already exists.")
 
-if _name_ == "_main_":
-    generate_key()
 def load_key():
     """Load the encryption key from file."""
     if not os.path.exists(KEY_FILE):
         raise FileNotFoundError("❌ Encryption key not found. Run generate_key() first.")
     with open(KEY_FILE, "rb") as f:
         return f.read()
+
 def encrypt_file(file_path):
     """Encrypt a file using AES encryption."""
     key = load_key()
@@ -37,6 +36,7 @@ def encrypt_file(file_path):
 
     os.remove(file_path)  # Remove the original file
     print(f"🔒 File '{file_path}' encrypted successfully.")
+
 def decrypt_file(file_path):
     """Decrypt a file encrypted with AES."""
     key = load_key()
@@ -55,12 +55,12 @@ def decrypt_file(file_path):
 
     os.remove(file_path)  # Remove the encrypted file
     print(f"🔓 File '{original_path}' decrypted successfully.")
+
 def ensure_enc_extension(file_name):
     """Ensure the file has the .enc extension."""
     if not file_name.endswith(".enc"):
         file_name += ".enc"
     return file_name
-import os
 
 def encrypt_and_store(username, file_name):
     """Encrypt a file and store it securely."""
@@ -71,6 +71,7 @@ def encrypt_and_store(username, file_name):
         encrypt_file(file_path)
     else:
         print(f"❌ Error: '{file_name}' not found for user '{username}'.")
+
 def decrypt_and_read(username, file_name):
     """Decrypt a file and read its content."""
     folder_path = os.path.join("secure_files", username)
@@ -87,5 +88,6 @@ def decrypt_and_read(username, file_name):
         encrypt_file(decrypted_path)  # Re-encrypt after reading
     else:
         print(f"❌ Error: '{file_name}' not found.")
-if _name_ == "_main_":
+
+if __name__ == "__main__":
     print("🔐 Secure Encryption Module Loaded.")

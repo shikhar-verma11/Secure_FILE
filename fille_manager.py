@@ -18,3 +18,17 @@ def create_file(username, file_name, content):
         f.write(content)
 
     print(f"✅ File '{file_name}' created for user '{username}'.")
+def read_file(username, file_name):
+    """Read a file's content."""
+    folder_path = get_user_folder(username)
+    file_path = os.path.join(folder_path, file_name)
+
+    if not os.path.exists(file_path):
+        print(f"❌ Error: File '{file_name}' not found.")
+        return
+
+    with open(file_path, "r") as f:
+        content = f.read()
+
+    print(f"\n📖 Content of '{file_name}':\n{content}\n")
+

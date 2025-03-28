@@ -74,3 +74,35 @@ def list_user_files(username):
 
     return files
 
+
+if _name_ == "_main_":
+    while True:
+        print("\n1. Create File\n2. Read File\n3. Update File\n4. Delete File\n5. List Files\n6. Exit")
+        choice = input("Enter choice: ").strip()
+
+        if choice == "1":
+            username = input("Enter username: ")
+            file_name = input("Enter file name: ")
+            content = input("Enter file content: ")
+            create_file(username, file_name, content)
+        elif choice == "2":
+            username = input("Enter username: ")
+            file_name = input("Enter file name: ")
+            read_file(username, file_name)
+        elif choice == "3":
+            username = input("Enter username: ")
+            file_name = input("Enter file name: ")
+            new_content = input("Enter new content: ")
+            update_file(username, file_name, new_content)
+        elif choice == "4":
+            username = input("Enter username: ")
+            file_name = input("Enter file name: ")
+            delete_file(username, file_name)
+        elif choice == "5":
+            username = input("Enter username: ")
+            list_user_files(username)
+        elif choice == "6":
+            break
+
+
+print("\nSecure File Management System Initialized.")

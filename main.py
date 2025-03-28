@@ -16,6 +16,8 @@ def update_file(username):
     if not files:
         print("No files available to update.")
         return
+
+    # ✅ Display available files
     print("Your Encrypted Files:")
     for idx, file in enumerate(files, 1):
         print(f"{idx}. {file}")

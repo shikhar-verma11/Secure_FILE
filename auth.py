@@ -197,3 +197,13 @@ def verify_2fa_code(secret, otp):
     """Verify the TOTP 2FA code for Streamlit."""
     totp = pyotp.TOTP(secret)
     return totp.verify(otp)
+
+def get_user_secret(username):
+    """Retrieve the TOTP secret for a given user."""
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute('SELECT totp_secret FROM users WHERE username = ?', (username,))
+    result = cursor.fetchone()
+    conn.close()
+    return result[0] if result else None
+

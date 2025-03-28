@@ -152,3 +152,48 @@ if __name__ == "__main__":
             break
         else:
             print("❌ Invalid choice. Please try again.")
+
+# === STREAMLIT-COMPATIBLE FUNCTIONS ===
+
+def register_user(username, password):
+    """Register a user for Streamlit and return (success, message, secret or None)"""
+    if not validate_username(username):
+        return False, "Username must be at least 3 characters long.", None
+    if not validate_password(password):
+        return False, "Password must be at least 6 characters long.", None
+
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    secret = pyotp.random_base32()
+
+    try:
+        cursor.execute(
+            'INSERT INTO users (username, password_hash, role, totp_secret) VALUES (?, ?, ?, ?)',
+            (username, hash_password(password), 'user', secret)
+        )
+        conn.commit()
+        return True, "User registered successfully.", secret
+    except sqlite3.IntegrityError:
+        return False, "Username already exists.", None
+    finally:
+        conn.close()
+
+
+def login_user(username, password):
+    """Login function for Streamlit. Returns (success, role or message, secret)"""
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute('SELECT password_hash, role, totp_secret FROM users WHERE username = ?', (username,))
+    result = cursor.fetchone()
+    conn.close()
+
+    if result and result[0] == hash_password(password):
+        return True, result[1], result[2]  # (success, role, secret)
+    else:
+        return False, "Invalid credentials", None
+
+
+def verify_2fa_code(secret, otp):
+    """Verify the TOTP 2FA code for Streamlit."""
+    totp = pyotp.TOTP(secret)
+    return totp.verify(otp)
